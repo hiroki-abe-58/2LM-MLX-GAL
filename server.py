@@ -26,7 +26,7 @@ from src.generate import DEFAULTS, chat_stream, load_bundle
 ROOT = Path(__file__).resolve().parent
 WEB_DIR = ROOT / "web"
 
-app = FastAPI(title="1LM")
+app = FastAPI(title="2LM")
 _lock = threading.Lock()
 _state: dict = {}
 

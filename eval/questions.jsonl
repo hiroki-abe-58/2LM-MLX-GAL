@@ -1,0 +1,20 @@
+{"id": "greet_1", "category": "挨拶", "turns": ["こんにちは"]}
+{"id": "greet_2", "category": "挨拶", "turns": ["おはようございます"]}
+{"id": "greet_3", "category": "挨拶", "turns": ["元気ですか"]}
+{"id": "greet_4", "category": "挨拶", "turns": ["はじめまして"]}
+{"id": "fact_1", "category": "事実質問", "turns": ["日本の首都はどこですか"], "keywords": ["東京", "日本", "首都"]}
+{"id": "fact_2", "category": "事実質問", "turns": ["猫について教えてください"], "keywords": ["猫", "動物", "ペット"]}
+{"id": "fact_3", "category": "事実質問", "turns": ["プログラミングとは何ですか"], "keywords": ["プログラ", "コンピュータ", "言語"]}
+{"id": "fact_4", "category": "事実質問", "turns": ["富士山の高さを知っていますか"], "keywords": ["富士", "山", "メートル", "高"]}
+{"id": "emo_1", "category": "相談・感情", "turns": ["最近仕事がうまくいかなくて落ち込んでいます"], "keywords": ["仕事"]}
+{"id": "emo_2", "category": "相談・感情", "turns": ["友達と喧嘩してしまいました"], "keywords": ["友達", "喧嘩", "友人"]}
+{"id": "emo_3", "category": "相談・感情", "turns": ["疲れました"], "keywords": ["疲", "休"]}
+{"id": "emo_4", "category": "相談・感情", "turns": ["ありがとうございます"]}
+{"id": "inst_1", "category": "指示", "turns": ["おすすめの本を3つ挙げてください"], "keywords": ["本", "小説", "読"]}
+{"id": "inst_2", "category": "指示", "turns": ["短く自己紹介してください"], "keywords": ["私", "AI", "言語モデル"]}
+{"id": "inst_3", "category": "指示", "turns": ["予定を立てるコツを教えてください"], "keywords": ["予定", "計画", "時間"]}
+{"id": "inst_4", "category": "指示", "turns": ["今日はとても良い天気なので散歩に行きました。これを短く言い換えてください"], "keywords": ["天気", "散歩"]}
+{"id": "ctx_1", "category": "2ターン目", "turns": ["猫を飼っています", "名前は何がいいと思いますか"], "keywords": ["猫", "名前"]}
+{"id": "ctx_2", "category": "2ターン目", "turns": ["東京に住んでいます", "おすすめの場所はありますか"], "keywords": ["東京", "場所"]}
+{"id": "ctx_3", "category": "2ターン目", "turns": ["プログラミングを勉強しています", "何から始めればいいですか"], "keywords": ["プログラ", "始", "言語"]}
+{"id": "ctx_4", "category": "2ターン目", "turns": ["昨日映画を見ました", "どう思いますか"], "keywords": ["映画"]}

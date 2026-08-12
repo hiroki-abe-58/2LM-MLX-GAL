@@ -7,6 +7,7 @@ __pycache__/
 data/corpus.txt
 data/corpus.meta.json
 data/cache/
+data/exp/
 data/raw/*
 !data/raw/.gitkeep
 
@@ -14,10 +15,18 @@ data/raw/*
 checkpoints/*
 !checkpoints/final
 
-# 学習ログは絶対パスを含むので loss.csv だけ残す
+# 学習ログは絶対パスを含むので loss.csv と評価結果だけ残す
 runs/*
 !runs/loss.csv
+!runs/eval_*.json
+# 対照実験の損失曲線は記事の根拠なので残す
+!runs/exp/
+runs/exp/*
+!runs/exp/*.csv
 
 # 記事の原稿はローカル管理（docs/images だけ公開する）
 docs/*.md
 tools/to_note.py
+
+# windowsに渡す用
+win/*

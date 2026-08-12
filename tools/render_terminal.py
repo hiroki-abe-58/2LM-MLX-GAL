@@ -101,7 +101,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("input")
     ap.add_argument("--out", default="docs/images/cli-chat.png")
-    ap.add_argument("--title", default="1lm — python src/chat_cli.py")
+    ap.add_argument("--title", default="2lm — python src/chat_cli.py")
     ap.add_argument("--font-size", type=int, default=15)
     ap.add_argument("--scale", type=int, default=2)
     ap.add_argument("--cols", type=int, default=92)

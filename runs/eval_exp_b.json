@@ -1,0 +1,241 @@
+{
+  "tag": "exp_b",
+  "ckpt": "checkpoints/exp_b",
+  "bits_per_char": 2.809,
+  "repetition_rate": 0.15,
+  "topic_rate": 0.467,
+  "broken_rate": 0.05,
+  "avg_reply_len": 61.5,
+  "sampling": {
+    "temperature": 0.8,
+    "top_k": 40,
+    "repetition_penalty": 1.15,
+    "seed": 777
+  },
+  "results": [
+    {
+      "id": "greet_1",
+      "category": "挨拶",
+      "turns": [
+        "こんにちは"
+      ],
+      "reply": "こんにちは。今日は、あなたがお手伝いしてくれるアシスタントです。どのようなご用件でしょうか？",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": null
+    },
+    {
+      "id": "greet_2",
+      "category": "挨拶",
+      "turns": [
+        "おはようございます"
+      ],
+      "reply": "おはようございます！今日はどのようなご用件でしょうか？",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": null
+    },
+    {
+      "id": "greet_3",
+      "category": "挨拶",
+      "turns": [
+        "元気ですか"
+      ],
+      "reply": "私はこの文章で、あなたの質問に答えるために最善を尽くします。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": null
+    },
+    {
+      "id": "greet_4",
+      "category": "挨拶",
+      "turns": [
+        "はじめまして"
+      ],
+      "reply": "そんなに良くなるためのレッスンが見つからないことをお手伝いします。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": null
+    },
+    {
+      "id": "fact_1",
+      "category": "事実質問",
+      "turns": [
+        "日本の首都はどこですか"
+      ],
+      "reply": "「日本」について、特定の情報があります。例えば地域や国際会の公式ウェブサイトを確認したい場合は、それらの詳細な情報を提供していただければと思います。 例えば、「日本で最も注目が必要ですか？」という文章となる具合について教えてください。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "fact_2",
+      "category": "事実質問",
+      "turns": [
+        "猫について教えてください"
+      ],
+      "reply": "猫には猫がいると、猫があります。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "fact_3",
+      "category": "事実質問",
+      "turns": [
+        "プログラミングとは何ですか"
+      ],
+      "reply": "プログラミング言語が役立つことを願っていません。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "fact_4",
+      "category": "事実質問",
+      "turns": [
+        "富士山の高さを知っていますか"
+      ],
+      "reply": "もちろん、富士山の高さは約8,50メートル（1934マイル）です。これらの広島が中国人の高さによって形成され、多くの地域にあると予想されました。次に、農村と南アジアの高さは85～17メートル（1983）です。この場合、この種は主要な大阪の高さで、カタロニアの高さの低さを超えており、地域と富士山が発生しました。 これらの都市には、スポーツ州、オジュガール、ショッピング、ヨーク州、スパイモラブルなどが",
+      "repetition": true,
+      "broken": true,
+      "keyword_hit": true
+    },
+    {
+      "id": "emo_1",
+      "category": "相談・感情",
+      "turns": [
+        "最近仕事がうまくいかなくて落ち込んでいます"
+      ],
+      "reply": "お話しできて嬉しいよ。何か他に質問があれば、遠慮なく聞いてください。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "emo_2",
+      "category": "相談・感情",
+      "turns": [
+        "友達と喧嘩してしまいました"
+      ],
+      "reply": "大きな魔法のようで、まずはしばらく「おはようございます！」という言葉を使った例文をいくつか紹介します。 1. 彼女に関連付け取り組んで、彼女の笑顔が見つかるまで、あなたが言わないことを知っています！ 2. 「すみませんが、私はあなたが答えたように私に話しかけません。」 3. 彼らの名前：私はあなたが何を助けることを望んでいますか？",
+      "repetition": true,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "emo_3",
+      "category": "相談・感情",
+      "turns": [
+        "疲れました"
+      ],
+      "reply": "どういたしまして！今日あなたのお手伝いはできることがあれば、遠慮なく聞かせてください。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "emo_4",
+      "category": "相談・感情",
+      "turns": [
+        "ありがとうございます"
+      ],
+      "reply": "どういたしまして！お役に立ててうれしいです。他に何か必要なことはありますか？",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": null
+    },
+    {
+      "id": "inst_1",
+      "category": "指示",
+      "turns": [
+        "おすすめの本を3つ挙げてください"
+      ],
+      "reply": "もちろんです、お手伝いします。どのジャンルについてお教えですか？",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "inst_2",
+      "category": "指示",
+      "turns": [
+        "短く自己紹介してください"
+      ],
+      "reply": "あなたのプロジェクトにはよく説明できますか？",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "inst_3",
+      "category": "指示",
+      "turns": [
+        "予定を立てるコツを教えてください"
+      ],
+      "reply": "一つのコツは、最も深刻なコントローラーと呼ばれます。 3. Concetsipleアプリケーション（Midraft Spourick）。 4. Hightfroidml - Veynt wayngsの開発者、インタビットの開始者を作成することができます。 5. EICRは、1920年代から2017年に発表されたコロナウイルスの開発者です。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "inst_4",
+      "category": "指示",
+      "turns": [
+        "今日はとても良い天気なので散歩に行きました。これを短く言い換えてください"
+      ],
+      "reply": "今日の天気は晴れです。何かお手伝いできることがありましたら、お知らせください！",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "ctx_1",
+      "category": "2ターン目",
+      "turns": [
+        "猫を飼っています",
+        "名前は何がいいと思いますか"
+      ],
+      "reply": "名前はオープンアシスタントです。あなたが望むものを見ることができます、私はアカデミックとして機能しますが、それはあなたがあなたのペットに依存することを許されているかもしれません。",
+      "repetition": true,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "ctx_2",
+      "category": "2ターン目",
+      "turns": [
+        "東京に住んでいます",
+        "おすすめの場所はありますか"
+      ],
+      "reply": "もちろんです、お手伝いします。どのような場所について知りたいですか？",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "ctx_3",
+      "category": "2ターン目",
+      "turns": [
+        "プログラミングを勉強しています",
+        "何から始めればいいですか"
+      ],
+      "reply": "こんにちは、あなたが何か尋ねることで今日いっぱいかわかりません。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "ctx_4",
+      "category": "2ターン目",
+      "turns": [
+        "昨日映画を見ました",
+        "どう思いますか"
+      ],
+      "reply": "あなたがどうやっているのか、そして私は「今日」と尋ねようとすることができます。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    }
+  ]
+}

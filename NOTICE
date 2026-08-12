@@ -1,4 +1,4 @@
-1LM
+2LM-MLX
 Copyright (c) 2026 hiroki-abe-58
 
 このリポジトリのコード（src/, data/prepare.py, tools/, web/, server.py）は
@@ -12,8 +12,14 @@ MIT License で提供しています。LICENSE を参照してください。
 同梱の重みは、以下の Apache License 2.0 で公開されているデータセットから
 学習したものです。再配布・商用利用のいずれの場合も、この出典表示を保持してください。
 
-  OpenAssistant Conversations Dataset (OASST1)
+data/prepare.py が対応しているデータセットは、いずれも Apache License 2.0 で、
+ShareAlike（継承）条件を持たないものだけを選んでいます。継承条件つきのデータ
+（CC BY-SA など）は、その条件が学習済みの重みに及ぶかどうかが明確でないため、
+配布ライセンスの整合を保つ目的で意図的に採用していません。
+
+  OpenAssistant Conversations Dataset (OASST1 / OASST2)
     https://huggingface.co/datasets/OpenAssistant/oasst1
+    https://huggingface.co/datasets/OpenAssistant/oasst2
     Copyright (c) OpenAssistant / LAION-AI contributors
     Licensed under the Apache License, Version 2.0
 
@@ -21,13 +27,35 @@ MIT License で提供しています。LICENSE を参照してください。
     https://huggingface.co/datasets/kunishou/oasst1-89k-ja
     Licensed under the Apache License, Version 2.0
 
+  oasst2-33k-ja（OASST2 の英語サブセットを DeepL で日本語化したもの）
+    https://huggingface.co/datasets/llm-jp/oasst2-33k-ja
+    Copyright (c) LLM-jp
+    Licensed under the Apache License, Version 2.0
+
+  magpie-sft-v1.0（Magpie 法による日本語合成対話データ）
+    https://huggingface.co/datasets/llm-jp/magpie-sft-v1.0
+    Copyright (c) LLM-jp
+    Licensed under the Apache License, Version 2.0
+    生成に用いられたモデル: cyberagent/calm3-22b-chat (Apache-2.0),
+    Qwen/Qwen2.5-32B-Instruct (Apache-2.0)
+
+  Magpie-Tanuki-8B-97k（Magpie 法による日本語合成対話データ）
+    https://huggingface.co/datasets/Aratako/Magpie-Tanuki-8B-97k
+    Copyright (c) Aratako
+    Licensed under the Apache License, Version 2.0
+    生成に用いられたモデル: weblab-GENIAC/Tanuki-8B-dpo-v1.0 (Apache-2.0)
+
 Apache License, Version 2.0 の全文は licenses/Apache-2.0.txt に同梱しています。
 原文: http://www.apache.org/licenses/LICENSE-2.0
 
 加えた変更（Apache License 2.0 Section 4(b) に基づく記載）:
 
-  - prompter と assistant のペアを parent_id から復元した
+  - OASST1 では prompter と assistant のペアを parent_id から復元した
+  - conversations / messages 形式のデータセットでは、隣り合う user と
+    assistant の発言を取り出して1組の会話にした（3ターン目以降は分割）
   - 翻訳失敗フラグ（ng_translation == "1"）の立ったレコードを除外した
+  - 翻訳の崩れたレコードを、質問と返答の一致・短い並びの過剰な反復を
+    手がかりに除外した（oasst2-33k-ja には翻訳失敗フラグがないため）
   - 質問・返答の長さでフィルタし、重複を除去した
   - 出現頻度の低い文字を含む会話を除外した
   - 改行を半角スペースに置換し、1行1会話のプレーンテキストに整形した
@@ -35,6 +63,7 @@ Apache License, Version 2.0 の全文は licenses/Apache-2.0.txt に同梱して
 以上の処理は data/prepare.py に実装されています。
 整形後のコーパス自体はリポジトリに含めていません。
 data/prepare.py を実行すると同じものが再現できます。
+どのデータセットを使ったかは data/prepare.py --list-sources で確認できます。
 
 
 ================================================================================

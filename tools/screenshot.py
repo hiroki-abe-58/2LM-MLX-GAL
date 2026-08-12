@@ -23,7 +23,7 @@ from pathlib import Path
 import websockets
 
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-PROFILE = Path("/tmp/1lm-chrome-profile")
+PROFILE = Path("/tmp/2lm-chrome-profile")
 
 
 class CDP:

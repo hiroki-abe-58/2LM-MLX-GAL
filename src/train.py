@@ -83,6 +83,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus", default=str(ROOT / "data" / "corpus.txt"))
     ap.add_argument("--out", default=str(ROOT / "checkpoints" / "final"))
+    ap.add_argument("--log", default="", help="損失ログの出力先 (既定: runs/loss.csv)")
     # 既定値は M1 Max (32コアGPU) の実測 47k tok/s から逆算したもの。
     # 自分のマシンでは --minutes 2 くらいで tok/s を測ってから決め直すとよい。
     ap.add_argument("--steps", type=int, default=4300)
@@ -179,7 +180,8 @@ def main() -> None:
 
     runs = ROOT / "runs"
     runs.mkdir(exist_ok=True)
-    log_path = runs / "loss.csv"
+    log_path = Path(args.log) if args.log else runs / "loss.csv"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
     log_path.write_text("step,elapsed_sec,lr,train_loss,val_loss\n", encoding="utf-8")
 
     model.train()

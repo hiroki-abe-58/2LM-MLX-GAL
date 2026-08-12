@@ -1,13 +1,28 @@
-# 1LM &mdash; 1時間で作る自作ミニ言語モデル
+# 2LM-MLX &mdash; 自作ミニ言語モデルを、会話が成立するところまで
 
 Apple Silicon の Mac 1台で、**ライブラリのモデルを一切使わずに** 言語モデルを作って会話するまでの
 一式です。ルールベースの応答ではなく、コーパスから学習した Transformer が
 「次の1文字」を予測し続けることで会話が成立します。
 
 - フレームワーク: **MLX**（Apple 純正。`pip install mlx` だけでGPUが使える）
-- モデル: 文字レベル ミニGPT / 6層 / 384次元 / 6ヘッド / 文脈256文字 / **11.5M パラメータ**
-- データ: `kunishou/oasst1-89k-ja`（Apache-2.0）を整形した日本語会話 28,616 件
-- 学習時間: MacBook Pro M1 Max で **約30分**（val loss 1.86 / 3,600ステップ）
+- モデル: 文字レベル ミニGPT / 6層 / 384次元 / 6ヘッド / 文脈256文字 / **11.7M パラメータ**
+- データ: Apache-2.0 の日本語対話データセット4件を整形した **949万文字**
+- 学習時間: MacBook Pro M1 Max で **約25分**（3,600ステップ）
+
+## 1LM（前作）との関係
+
+これは [1LM](https://github.com/hiroki-abe-58/1LM) の続きです。
+1LM は「1時間で動くものを作る」ことを目標にした教材で、解説記事に対応する状態で**凍結しています**。
+記事のとおりに手を動かせば同じ数字が出るようにしてあるので、まずはそちらから始めてください。
+
+このリポジトリは、そこで残った「会話が成立しない」という課題に取り組む続編です。
+1LM から変わっている点は次のとおりで、**コーパスの作り方が変わっているため
+1LM の記事にある数字（28,616会話 / 441万文字）はここでは再現しません**。
+
+- 学習に使えるデータセットを1件から4件に増やした（`--sources`）
+- 翻訳が壊れた会話を弾くフィルタを足した（`looks_broken()`）
+- バージョン間を比較するための評価の仕組みを追加した（`eval/`）
+- 同梱の重みを、増量したコーパスで学習し直したものに差し替えた
 
 ![チャットGUI](docs/images/gui-chat.png)
 
@@ -33,8 +48,8 @@ Apple Silicon の Mac 1台で、**ライブラリのモデルを一切使わず�
 
 ```bash
 # Apple Silicon (arm64) 固定で新しい環境を作る
-CONDA_SUBDIR=osx-arm64 conda create -n 1lm python=3.11 -y
-conda activate 1lm
+CONDA_SUBDIR=osx-arm64 conda create -n 2lm python=3.11 -y
+conda activate 2lm
 conda config --env --set subdir osx-arm64
 
 pip install -r requirements.txt
@@ -47,10 +62,12 @@ Windows / Linux でも `mlx` を `torch` に読み替えれば同じ構成が組
 ## 1. コーパスを作る
 
 ```bash
-python data/prepare.py
+python data/prepare.py --exclude eval/holdout.txt
 ```
 
-`data/corpus.txt` に「1行1会話」のテキストができます。
+`data/corpus.txt` に「1行1会話」のテキストが約950万文字ぶんできます。
+`--exclude` は採点用の検証セットを訓練から外すためのもので、
+あとで [4. 採点する](#4-採点する) をやるなら必ず付けてください。
 
 ```
 <|user|>おすすめの本はありますか？<|assistant|>SFがお好きなら...<|end|>
@@ -59,10 +76,26 @@ python data/prepare.py
 主なオプション。
 
 ```bash
+python data/prepare.py --sources oasst1   # 1LM（前作）と同じ1件だけ使う（約400万文字）
 python data/prepare.py --max-a 150        # 短い返答だけ使う（学習が安定しやすい）
 python data/prepare.py --min-char-freq 20 # 語彙をさらに絞る
 python data/prepare.py --no-hf            # data/raw/ の自分のデータだけで作る
 ```
+
+### 使えるデータセット
+
+既定では次の4件すべてを使います。`--sources` で絞れます。`--list-sources` で一覧が出ます。
+
+| キー | データセット | 特徴 |
+|---|---|---|
+| `oasst1` | [kunishou/oasst1-89k-ja](https://huggingface.co/datasets/kunishou/oasst1-89k-ja) | 既定。翻訳失敗フラグつきで扱いやすい |
+| `oasst2` | [llm-jp/oasst2-33k-ja](https://huggingface.co/datasets/llm-jp/oasst2-33k-ja) | DeepL 翻訳。失敗フラグが無いので自前で弾く |
+| `magpie` | [llm-jp/magpie-sft-v1.0](https://huggingface.co/datasets/llm-jp/magpie-sft-v1.0) | 最初から日本語の合成データ。訳崩れが無い |
+| `tanuki` | [Aratako/Magpie-Tanuki-8B-97k](https://huggingface.co/datasets/Aratako/Magpie-Tanuki-8B-97k) | 同上。品質フィルタ未実施と明記されている |
+
+**4つとも Apache-2.0 で、ShareAlike（継承）条件がありません。** 日本語の対話データには
+CC BY-SA のものも多いのですが、継承条件が学習済みの重みに及ぶかは決着していない論点なので、
+重みを配布する前提のこのリポジトリでは最初から候補に入れていません。詳しくは [NOTICE](NOTICE) を参照してください。
 
 ### 自分のデータで学習する
 
@@ -77,6 +110,27 @@ python data/prepare.py --no-hf            # data/raw/ の自分のデータだ�
 # data/raw/mydata.tsv
 調子はどう？	ばっちりです。
 ```
+
+文字レベルなので、**数万文字では文法が立ち上がりません**。最低でも100万文字は欲しいところです。
+
+### キャラクターを持たせる（おまけ）
+
+架空の「ギャルのLINE」会話コーパスを生成するスクリプトを同梱しています。
+モデルの人格がデータで決まることを、いちばん短時間で体験できます。
+
+```bash
+python data/gal/generate.py    # data/raw/gal_line.jsonl に約102万文字を生成
+python data/prepare.py         # 公開データセットと混ぜる（--no-hf でギャルだけ）
+python src/train.py
+```
+
+学習させる会話はこんな形です（生成されるデータの例。モデルの出力ではありません）。
+
+```jsonc
+{"user": "AIとは何ですか", "assistant": "AI？ なんかこう、めっちゃ頭いいパソコンでしょ。うちより賢いのは確実"}
+```
+
+設計と、テンプレート生成でデータを作るときの注意点は `data/gal/README.md` にまとめてあります。
 
 ## 2. 学習する
 
@@ -97,15 +151,21 @@ python src/train.py --steps 8000 --minutes 70   # じっくり
 
 ![学習曲線](docs/images/loss-curve.png)
 
-実測値（MacBook Pro M1 Max / 32コアGPU）。
+同梱の重みの実測値（MacBook Pro M1 Max / 32コアGPU）。
 
 | 項目 | 値 |
 |---|---|
-| 学習時間 | 32分 / 3,600ステップ |
-| 最終 train loss | 1.751 |
-| 最良 val loss | 1.857 |
-| スループット | 31k tok/s |
-| 生成速度 | 200〜300 文字/秒 |
+| 学習時間 | 22.7分 / 3,600ステップ |
+| 学習トークン | 962万（検証 9.7万） |
+| 語彙 / パラメータ | 2,578 文字 / 11.73M |
+| 最終 train loss | 1.925 |
+| 最良 val loss | 1.947 |
+| スループット | 43k tok/s |
+| 生成速度 | 250〜290 文字/秒 |
+
+この val loss は**このコーパスの検証用スライスで測った値**なので、
+コーパスが違う実行どうしで水準を比べることはできません。
+バージョン間の比較には [4. 採点する](#4-採点する) の `bits/char` を使ってください。
 
 ## 3. 会話する
 
@@ -117,8 +177,8 @@ python src/chat_cli.py
 
 ```
 あなた> こんにちは
-1LM  > こんにちは、私はあなたを助けることができますか？
-(24 文字 / 0.1秒 / 234 文字毎秒)
+2LM  > こんにちは！あなたのお手伝いできることがあれば、何かお手伝いできますよ。
+(36 文字 / 0.1秒 / 278 文字毎秒)
 ```
 
 ![CLIチャット](docs/images/cli-chat.png)
@@ -145,6 +205,63 @@ python server.py --open      # Chrome が開く
 
 ![生成設定](docs/images/gui-settings.png)
 
+## 4. 採点する
+
+「なんか賢くなった気がする」を潰すための評価スクリプトです。
+固定20問と固定検証セットで採点し、前回の結果と並べて表示します。
+
+```bash
+python eval/run.py --make-holdout           # 固定検証セットを切り出す（最初に1回）
+python eval/run.py --tag base               # 採点して runs/eval_base.json に保存
+python eval/run.py --tag next --compare base # 前回と並べる
+```
+
+学習し直すときは、検証セットを暗記させないよう必ず除外してください。
+
+```bash
+python data/prepare.py --exclude eval/holdout.txt
+```
+
+指標は4つです。実測値は「oasst1 だけ（405万文字）」と「4データセット（949万文字）」を、
+モデルも学習設定も揃えて比べたものです。
+
+| 指標 | 意味 | 405万文字 | 949万文字 |
+|---|---|---|---|
+| bits/char | 検証セットの損失を1文字あたりのビット数に正規化 | 3.282 | **2.809** |
+| 反復率 | 同じ3文字並びが3回以上出る返答の割合 | 10.0% | 15.0% |
+| 主題保持率 | 質問の主題語が返答に現れた割合 | 40.0% | 46.7% |
+| 破綻率 | 空・極端に短い・打ち切りで終わった返答の割合 | 0.0% | 5.0% |
+
+20問しかないので、反復率と破綻率の 5ポイント差は 1問ぶんです。差として読まないでください。
+
+`bits/char` にしているのは、**トークナイザを変えても比較できるようにする**ためです。
+文字レベルからサブワードに変えると1トークンの予測は難しくなるので、
+`nats/token` のままだと改善しても悪化して見えます。
+
+### 検証セットは全ソースから切ること
+
+`--make-holdout` は、そのとき渡したコーパスの末尾から検証セットを切ります。
+**学習に使う予定のデータセットを全部混ぜたコーパスから切ってください。**
+
+最初これを oasst1 だけから切ってしまい、oasst1 だけで学習したモデルにとってだけ
+「見慣れた文体」の物差しになりました。その結果、体感で明らかに良くなっている
+増量版のほうが bits/char は悪い、という逆転した数字が出ました。
+
+### 学習曲線を並べる
+
+```bash
+python tools/compare_runs.py runs/exp/loss_a.csv:A runs/exp/loss_b.csv:B --out docs/images/loss-ab.png
+```
+
+![対照実験の学習曲線](docs/images/loss-ab.png)
+
+下段が汎化ギャップ（val - train）です。0 を上抜けた地点から暗記が優勢になります。
+データを 2.34倍にすると、この地点が step 750 から 1,750 へ、ほぼ比例して後ろにずれました。
+
+なお `runs/*.csv` の val loss は run ごとに別の文章で測っているので、
+**水準そのものを run 間で比べてはいけません**。比べられるのは曲線の形と、
+共通の検証セットで測った bits/char だけです。
+
 ## 仕組み
 
 ```mermaid
@@ -169,6 +286,9 @@ flowchart LR
 | [server.py](server.py) | FastAPI。SSE でトークンを流す |
 | [web/](web/) | Liquid Glass 風のチャットGUI |
 | [data/prepare.py](data/prepare.py) | コーパス整形 |
+| [data/gal/](data/gal/) | 架空の「ギャルのLINE」コーパス生成（キャラクター付与の実験用） |
+| [eval/run.py](eval/run.py) | 固定20問での採点。bits/char・反復率・主題保持率・破綻率 |
+| [tools/compare_runs.py](tools/compare_runs.py) | 複数の学習ログを重ねて、乖離点を出す |
 | [tools/](tools/) | 記事用の作図・撮影ツール（`pip install -r requirements-dev.txt`） |
 
 ## つまずきポイント
@@ -203,13 +323,13 @@ checkpoints/final/
 ### GitHubへ公開する
 
 ```bash
-gh repo create 1LM --public --source . --remote origin --push
+gh repo create my-lm --public --source . --remote origin --push
 # または
-git remote add origin git@github.com:<your-account>/1LM.git
+git remote add origin git@github.com:<your-account>/my-lm.git
 git push -u origin main
 ```
 
-`model.safetensors` は約44MBで、GitHubの警告ライン(50MB)未満なのでそのまま push できます。
+`model.safetensors` は約45MBで、GitHubの警告ライン(50MB)未満なのでそのまま push できます。
 これより大きいモデルを配る場合は Hugging Face Hub か Git LFS を使ってください。
 
 ## ライセンス / クレジット

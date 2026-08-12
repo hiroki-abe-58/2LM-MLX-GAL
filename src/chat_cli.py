@@ -85,7 +85,7 @@ def main() -> None:
     }
 
     print("=" * 60)
-    print(f"  1LM chat  {model.n_params/1e6:.2f}M params / "
+    print(f"  2LM chat  {model.n_params/1e6:.2f}M params / "
           f"vocab {tokenizer.vocab_size} / context {model.cfg.block_size}")
     print(f"{DIM}  /help でコマンド一覧, /exit で終了{RESET}")
     print("=" * 60)
@@ -110,7 +110,7 @@ def main() -> None:
                 history.clear()
             continue
 
-        print(f"{GREEN}1LM  >{RESET} ", end="", flush=True)
+        print(f"{GREEN}2LM  >{RESET} ", end="", flush=True)
         start = time.time()
         pieces = []
         for piece in chat_stream(model, tokenizer, history[-args.history:], line, **params):
