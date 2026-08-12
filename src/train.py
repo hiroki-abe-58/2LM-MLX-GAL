@@ -40,7 +40,11 @@ SAMPLE_PROMPTS = ("こんにちは", "おすすめの本を教えてください
 
 
 def build_dataset(
-    corpus: Path, cache_dir: Path, min_char_freq: int, vocab_size: int
+    corpus: Path,
+    cache_dir: Path,
+    min_char_freq: int,
+    vocab_size: int,
+    pretrained: Tokenizer | None = None,
 ) -> tuple[np.ndarray, Tokenizer]:
     """コーパスをトークンID列 (uint16) に変換してキャッシュする.
 
@@ -48,6 +52,9 @@ def build_dataset(
     毎回エンコードし直すより速いしメモリにも丸ごと載る。
 
     vocab_size が 0 なら文字レベル、正の値なら SentencePiece を学習する。
+    pretrained を渡した場合は学習済みのトークナイザをそのまま使う。追加学習では
+    語彙を作り直してはいけない。作り直すとIDの対応が変わり、事前学習した重みが
+    全部無意味になる。
     """
     cache_dir.mkdir(parents=True, exist_ok=True)
     tokens_path = cache_dir / "tokens.npy"
@@ -57,6 +64,9 @@ def build_dataset(
         "mtime": corpus.stat().st_mtime,
         "min_char_freq": min_char_freq,
         "vocab_size": vocab_size,
+        "pretrained": None
+        if pretrained is None
+        else f"{type(pretrained).__name__}:{pretrained.vocab_size}",
     }
 
     cached = tokens_path.exists() and stamp_path.exists()
@@ -64,7 +74,9 @@ def build_dataset(
         return np.load(tokens_path), load_tokenizer(cache_dir)
 
     text = corpus.read_text(encoding="utf-8")
-    if vocab_size:
+    if pretrained is not None:
+        tokenizer = pretrained
+    elif vocab_size:
         tokenizer = SubwordTokenizer.train(text, vocab_size=vocab_size, model_dir=cache_dir)
     else:
         tokenizer = CharTokenizer.train(text, min_freq=min_char_freq)
@@ -95,6 +107,10 @@ def main() -> None:
     ap.add_argument("--corpus", default=str(ROOT / "data" / "corpus.txt"))
     ap.add_argument("--out", default=str(ROOT / "checkpoints" / "final"))
     ap.add_argument("--log", default="", help="損失ログの出力先 (既定: runs/loss.csv)")
+    ap.add_argument("--cache-dir", default=str(ROOT / "data" / "cache"),
+                    help="トークン化した結果の置き場。別のコーパスを使うときは分ける")
+    ap.add_argument("--init-from", default="",
+                    help="このチェックポイントから続けて学習する (追加学習)")
     # 既定値は M1 Max (32コアGPU) の実測 47k tok/s から逆算したもの。
     # 自分のマシンでは --minutes 2 くらいで tok/s を測ってから決め直すとよい。
     ap.add_argument("--steps", type=int, default=4300)
@@ -127,24 +143,37 @@ def main() -> None:
     mx.random.seed(args.seed)
     rng = np.random.default_rng(args.seed)
 
+    # 追加学習では、語彙も形も事前学習したものに合わせないといけない。
+    # コマンドラインで渡した --n-layer などは無視する。
+    base = Path(args.init_from) if args.init_from else None
+    pretrained = load_tokenizer(base) if base else None
+
     tokens, tokenizer = build_dataset(
-        Path(args.corpus), ROOT / "data" / "cache", args.min_char_freq, args.vocab_size
+        Path(args.corpus), Path(args.cache_dir), args.min_char_freq, args.vocab_size, pretrained
     )
     n_val = min(len(tokens) // 100, 200_000)
     train_data, val_data = tokens[:-n_val], tokens[-n_val:]
 
-    cfg = GPTConfig(
-        vocab_size=tokenizer.vocab_size,
-        block_size=args.block_size,
-        n_layer=args.n_layer,
-        n_head=args.n_head,
-        n_embd=args.n_embd,
-        dropout=args.dropout,
-    )
+    if base:
+        cfg = GPTConfig.load(base / "config.json")
+        cfg.dropout = args.dropout
+    else:
+        cfg = GPTConfig(
+            vocab_size=tokenizer.vocab_size,
+            block_size=args.block_size,
+            n_layer=args.n_layer,
+            n_head=args.n_head,
+            n_embd=args.n_embd,
+            dropout=args.dropout,
+        )
     model = MiniGPT(cfg)
+    if base:
+        model.load_weights(str(base / "model.safetensors"))
     mx.eval(model.parameters())
 
     print("=" * 62)
+    if base:
+        print(f"  続きから学習  : {base}")
     print(f"  語彙数        : {cfg.vocab_size}")
     print(f"  学習トークン  : {len(train_data):,} (検証 {len(val_data):,})")
     print(f"  パラメータ数  : {model.n_params/1e6:.2f} M")

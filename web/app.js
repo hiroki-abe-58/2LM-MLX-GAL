@@ -225,6 +225,11 @@ el.modalApply.addEventListener("click", () => {
 
 /* ---------- モデル情報 ---------- */
 
+// --port を変えても案内が食い違わないように、実際に開いている URL を出す
+document.querySelectorAll(".origin").forEach((node) => {
+  node.textContent = location.origin;
+});
+
 async function loadInfo() {
   try {
     const info = await (await fetch("/api/info")).json();

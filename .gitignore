@@ -4,12 +4,16 @@ __pycache__/
 .venv/
 
 # 生成物（学習で再現できるものはコミットしない）
-data/corpus.txt
-data/corpus.meta.json
-data/cache/
+data/corpus*.txt
+data/corpus*.meta.json
+data/cache*/
 data/exp/
 data/raw/*
 !data/raw/.gitkeep
+
+# ギャルコーパスはローカルLLMの出力。スクリプトだけ追跡する
+data/gal/raw.jsonl
+data/gal/topics.txt
 
 # 学習済みモデルは配布したいので final だけ追跡する（約44MB）
 checkpoints/*
@@ -18,6 +22,7 @@ checkpoints/*
 # 学習ログは絶対パスを含むので loss.csv と評価結果だけ残す
 runs/*
 !runs/loss.csv
+!runs/loss_gal.csv
 !runs/eval_*.json
 # 対照実験の損失曲線は記事の根拠なので残す
 !runs/exp/

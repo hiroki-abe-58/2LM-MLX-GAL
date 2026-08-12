@@ -114,24 +114,40 @@ CC BY-SA のものも多いのですが、継承条件が学習済みの重み�
 
 文字レベルなので、**数万文字では文法が立ち上がりません**。最低でも100万文字は欲しいところです。
 
-### キャラクターを持たせる（おまけ）
+### キャラクターを持たせる
 
-架空の「ギャルのLINE」会話コーパスを生成するスクリプトを同梱しています。
-モデルの人格がデータで決まることを、いちばん短時間で体験できます。
+架空の「ギャルのLINE」会話コーパスを作るスクリプトを同梱しています。
+**モデルの人格はデータの人格**であることを、いちばん短時間で体験できます。
+
+会話文は人間が書きません。ローカルで動かす **Qwen2.5-32B-Instruct（Apache-2.0）** に書かせます。
+Apache-2.0 のモデルには出力の利用条件がないので、作ったデータと重みをそのまま配布できます。
 
 ```bash
-python data/gal/generate.py    # data/raw/gal_line.jsonl に約102万文字を生成
-python data/prepare.py         # 公開データセットと混ぜる（--no-hf でギャルだけ）
-python src/train.py
+python data/gal/generate.py --stage topics          # 話題を列挙させる
+python data/gal/generate.py --stage pairs --target 4000   # 会話を書かせる（止めても再開できる）
+python data/gal/generate.py --stage build           # 検査してまとめる
 ```
 
-学習させる会話はこんな形です（生成されるデータの例。モデルの出力ではありません）。
+そのうえで、事前学習済みの重みに追加学習します。**40秒で終わります。**
 
-```jsonc
-{"user": "AIとは何ですか", "assistant": "AI？ なんかこう、めっちゃ頭いいパソコンでしょ。うちより賢いのは確実"}
+```bash
+python data/prepare.py --no-hf --out data/corpus_gal.txt --min-char-freq 1
+python src/train.py --init-from checkpoints/final --corpus data/corpus_gal.txt \
+    --cache-dir data/cache_gal --out checkpoints/gal --lr 1e-4 --warmup 12 --steps 90
 ```
 
-設計と、テンプレート生成でデータを作るときの注意点は `data/gal/README.md` にまとめてあります。
+実測は 2,610会話 / 111,574文字。出来上がったモデルはこう喋ります。
+
+![ギャル版のCLIチャット](docs/images/2lm-chat-gal-1.png)
+
+何を聞いても腹が減っているのは、データ側で返答の「機嫌」を5種類均等に振っていて、
+空腹と眠気が40%を占めているからです。**データの偏りがモデルの癖になります。**
+
+代償もあります。固定検証セットでの bits/char は 2.584 → 3.550、
+主題保持率は 0.733 → 0.267 と悪化します。汎用の応答能力を口調と引き換えにしています。
+
+混合比の実測、検査でふるいにかける基準、そして **この作業でMacをカーネルパニックで
+1回落とした話**は `data/gal/README.md` にまとめてあります。
 
 ## 2. 学習する
 
@@ -315,8 +331,9 @@ flowchart LR
 | [server.py](server.py) | FastAPI。SSE でトークンを流す |
 | [web/](web/) | Liquid Glass 風のチャットGUI |
 | [data/prepare.py](data/prepare.py) | コーパス整形 |
-| [data/gal/](data/gal/) | 架空の「ギャルのLINE」コーパス生成（キャラクター付与の実験用） |
+| [data/gal/](data/gal/) | 架空の「ギャルのLINE」コーパス生成。ローカルLLMで作る |
 | [eval/run.py](eval/run.py) | 固定20問での採点。bits/char・反復率・主題保持率・破綻率 |
+| [tools/mix_corpus.py](tools/mix_corpus.py) | コーパスを比率を決めて混ぜる（追加学習用） |
 | [tools/compare_runs.py](tools/compare_runs.py) | 複数の学習ログを重ねて、乖離点を出す |
 | [tools/pick_vocab.py](tools/pick_vocab.py) | 語彙サイズごとの圧縮率とパラメータ増を実測する |
 | [tools/](tools/) | 記事用の作図・撮影ツール（`pip install -r requirements-dev.txt`） |

@@ -5,3 +5,4 @@ uvicorn[standard]>=0.30
 datasets>=3.0
 huggingface_hub>=0.26
 sentencepiece>=0.2    # サブワード化 (--vocab-size)。文字レベルだけなら不要
+mlx-lm>=0.31          # data/gal/ の会話生成。キャラクター付与をやらないなら不要

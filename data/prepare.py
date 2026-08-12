@@ -173,11 +173,11 @@ def resolve_sources(spec: str) -> list[Source]:
     return [SOURCES_BY_KEY[k] for k in keys]
 
 
-def load_local_pairs() -> list[tuple[str, str]]:
+def load_local_pairs(raw_dir: Path = RAW_DIR) -> list[tuple[str, str]]:
     pairs: list[tuple[str, str]] = []
-    if not RAW_DIR.exists():
+    if not raw_dir.exists():
         return pairs
-    for path in sorted(RAW_DIR.iterdir()):
+    for path in sorted(raw_dir.iterdir()):
         if path.suffix == ".jsonl":
             for line in path.read_text(encoding="utf-8").splitlines():
                 line = line.strip()
@@ -264,6 +264,7 @@ def main() -> None:
     )
     ap.add_argument("--no-hf", action="store_true", help="公開データセットを使わない")
     ap.add_argument("--no-local", action="store_true", help="data/raw/ の自前データを使わない")
+    ap.add_argument("--raw-dir", default=str(RAW_DIR), help="自前データの置き場を差し替える")
     ap.add_argument("--list-sources", action="store_true", help="登録済みデータセットを表示")
     ap.add_argument(
         "--exclude",
@@ -287,9 +288,9 @@ def main() -> None:
             loaded = source.loader()
             print(f"{source.repo:<34}: {len(loaded)} 会話")
             pairs += loaded
-    local = [] if args.no_local else load_local_pairs()
+    local = [] if args.no_local else load_local_pairs(Path(args.raw_dir))
     if local:
-        print(f"{'data/raw/':<34}: {len(local)} 会話")
+        print(f"{args.raw_dir + '/':<34}: {len(local)} 会話")
     pairs += local
     if not pairs:
         raise SystemExit("会話が0件です。--no-hf を外すか data/raw/ にデータを置いてください。")
