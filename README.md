@@ -89,7 +89,8 @@ python data/gal/generate.py --stage pairs --target 4000    # 会話を書かせ�
 python data/gal/generate.py --stage build                 # 検査してまとめる（一瞬）
 ```
 
-初回は生成モデル（約18GB）のダウンロードが入ります。
+初回は生成モデル（約17GB）のダウンロードが入ります。
+`data/gal/runtime.py` がGPUメモリの上限を設定し、足りない場合は開始前に止めます。
 
 ### 会話文を人間が書いていない理由
 

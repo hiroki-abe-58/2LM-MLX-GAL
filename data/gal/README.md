@@ -140,15 +140,9 @@ calm3 は GQA（Grouped Query Attention）を持たない世代で、KVヘッド
 
 ## 使いかた
 
-### 混ぜて学習する
-
-```bash
-python data/gal/generate.py --stage build      # data/raw/gal_line.jsonl に書き出す
-python data/prepare.py                         # 公開データセットと一緒にコーパス化
-python src/train.py --vocab-size 8000
-```
-
-ギャルの比率が低いので、口調は少し混ざる程度になります。
+検査を通したデータセットは `data/raw/gal_line.jsonl` に同梱してあります。
+自分で作り直す場合だけ `--stage build` を走らせてください
+（`data/raw/gal_line.jsonl` を上書きします）。
 
 ### 追加学習でキャラクターを付ける（推奨）
 
@@ -201,7 +195,20 @@ python src/train.py --init-from checkpoints/final --corpus data/corpus_gal.txt \
 ところが会話2,610件では、混ぜなくても崩れませんでした。
 
 つまり**破滅的忘却の対策として最初に打つ手は、混ぜることではなくデータを増やすこと**です。
-混ぜるのは、汎用の応答能力を保ちたい場合の選択肢になります。
+混ぜるのは、汎用の応答能力を保ちたい場合の選択肢になります。試すなら `mix_corpus.py` で
+比率を指定します（`パス:繰り返し回数` の形式）。
+
+```bash
+python data/prepare.py --out data/corpus_all.txt          # 公開データセット側
+python tools/mix_corpus.py --out data/corpus_ft.txt \
+    data/corpus_gal.txt:3 data/corpus_all.txt:0.002
+```
+
+なお、調整すべきものは2つあります。**文字数の比率**が口調の寄り方を決め、
+**それぞれが何回学習されるか**が丸暗記するかを決めます。コーパスの中でギャルを
+N 回繰り返して全体を E エポック回せば、ギャルは N×E 回、公開データは E 回学習されます。
+上の 85% で丸暗記が起きたのは、比率を上げるために公開データ側の E も
+19 まで上げてしまったからです。
 
 採用した設定はこれです。
 
@@ -268,8 +275,10 @@ python src/train.py --init-from checkpoints/final --corpus data/corpus_gal.txt \
 | `generate.py` | 話題出し・会話生成・検査の3段階。止めても再開できる |
 | `validate.py` | 文字種・英単語・敬語・方言・重複でふるいにかける |
 | `runtime.py` | GPUメモリの上限設定と安全装置。Macを落とさないための仕掛け |
-| `topics.txt` | 1段目の出力。モデルが列挙した話題 |
+| `topics.txt` | 1段目の出力。モデルが列挙した話題（追跡対象外） |
 | `raw.jsonl` | 2段目の出力。検査前の生の会話（追跡対象外） |
+| `../raw/gal_line.jsonl` | 3段目の出力。検査を通った2,610会話（**同梱**） |
 
 `raw.jsonl` を `data/raw/` に置いていないのは意図的です。あそこに置くと
 `data/prepare.py` が未検査のまま拾ってしまいます。
+検査を通したものだけが `data/raw/` に出ます。
