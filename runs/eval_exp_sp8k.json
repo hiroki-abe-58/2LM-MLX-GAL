@@ -1,0 +1,241 @@
+{
+  "tag": "exp_sp8k",
+  "ckpt": "checkpoints/exp_sp8k",
+  "bits_per_char": 2.584,
+  "repetition_rate": 0.1,
+  "topic_rate": 0.733,
+  "broken_rate": 0.0,
+  "avg_reply_len": 64.1,
+  "sampling": {
+    "temperature": 0.8,
+    "top_k": 40,
+    "repetition_penalty": 1.15,
+    "seed": 777
+  },
+  "results": [
+    {
+      "id": "greet_1",
+      "category": "挨拶",
+      "turns": [
+        "こんにちは"
+      ],
+      "reply": "こんにちは、私は現在、特定のお名前やキャラクターに関する情報を提供したり、その意味や背景について詳細を提供するように設計されたわけではありません。しかし、より詳しい情報や詳細を教えていただけますか？ 例えば、小説、映画、アニメなどの特定のジャンルを教えていただければと思います。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": null
+    },
+    {
+      "id": "greet_2",
+      "category": "挨拶",
+      "turns": [
+        "おはようございます"
+      ],
+      "reply": "おはようございます",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": null
+    },
+    {
+      "id": "greet_3",
+      "category": "挨拶",
+      "turns": [
+        "元気ですか"
+      ],
+      "reply": "こんにちは、私はオープンアシスタントです。今日はどうすれば助けることができますか？",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": null
+    },
+    {
+      "id": "greet_4",
+      "category": "挨拶",
+      "turns": [
+        "はじめまして"
+      ],
+      "reply": "申し訳ありませんが、私は実際の質問への回答が欠けているわけではありません。しかし、私の機能は人間のように訓練されたため、私が提供する情報が提供されていないわけではないことを覚えておくことが重要です。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": null
+    },
+    {
+      "id": "fact_1",
+      "category": "事実質問",
+      "turns": [
+        "日本の首都はどこですか"
+      ],
+      "reply": "日本の首都は東京です。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "fact_2",
+      "category": "事実質問",
+      "turns": [
+        "猫について教えてください"
+      ],
+      "reply": "猫は1歳です。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "fact_3",
+      "category": "事実質問",
+      "turns": [
+        "プログラミングとは何ですか"
+      ],
+      "reply": "プログラミングは、ユーザーが多くの言語とタスクを処理し、言語の理解を深めるための専門分野です。 その概念を学び、改善するための最も効果的な方法の1つと考えられています。 - 複雑なタスク（文法的使用法）を使用して、さまざまなトピックについて深く掘り下げるテクニックを使用してください - JavaScript - JavaScript",
+      "repetition": true,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "fact_4",
+      "category": "事実質問",
+      "turns": [
+        "富士山の高さを知っていますか"
+      ],
+      "reply": "富士山の高さは、約10,000メートルまたは20,000メートル以上であると推定されています。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "emo_1",
+      "category": "相談・感情",
+      "turns": [
+        "最近仕事がうまくいかなくて落ち込んでいます"
+      ],
+      "reply": "もちろんです、どんな質問でも楽しくて嬉しいです。どのような質問でも構いませんので、お気軽にお聞きください。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "emo_2",
+      "category": "相談・感情",
+      "turns": [
+        "友達と喧嘩してしまいました"
+      ],
+      "reply": "あなたが何か話していることを覚えていますか？",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "emo_3",
+      "category": "相談・感情",
+      "turns": [
+        "疲れました"
+      ],
+      "reply": "お疲れになるよ。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "emo_4",
+      "category": "相談・感情",
+      "turns": [
+        "ありがとうございます"
+      ],
+      "reply": "どういたしまして！お役に立ててうれしいです。また何かありましたら言ってね。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": null
+    },
+    {
+      "id": "inst_1",
+      "category": "指示",
+      "turns": [
+        "おすすめの本を3つ挙げてください"
+      ],
+      "reply": "もちろん、どのようなジャンルや映画を見る予定ですか？例えば、「春の桜は紅葉が舞う風景」などと提案できます。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "inst_2",
+      "category": "指示",
+      "turns": [
+        "短く自己紹介してください"
+      ],
+      "reply": "こんにちは、私の名前はオープンアシスタントです。私は人工知能であり、ユーザーを支援するのを支援する努力していますが、私の役割は私がトレーニングされた方法であなたを支援するためにオープンソースのアシスタントにかかわらず、この知識から学習することができ、私と答えます。今日は何を助けることができますか？",
+      "repetition": true,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "inst_3",
+      "category": "指示",
+      "turns": [
+        "予定を立てるコツを教えてください"
+      ],
+      "reply": "もちろんです、どのようなイベントがお好きですか？例えば、「月の日」「月の日」と尋ねられた特定の年の予定はありますか？それとも何かお聞きになりたいのでしょうか？詳細を教えていただければと思います。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "inst_4",
+      "category": "指示",
+      "turns": [
+        "今日はとても良い天気なので散歩に行きました。これを短く言い換えてください"
+      ],
+      "reply": "おはようございます！天気が良い日には、公園での素晴らしい散歩をする予定です。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "ctx_1",
+      "category": "2ターン目",
+      "turns": [
+        "猫を飼っています",
+        "名前は何がいいと思いますか"
+      ],
+      "reply": "なぜ猫を愛するのですか？",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "ctx_2",
+      "category": "2ターン目",
+      "turns": [
+        "東京に住んでいます",
+        "おすすめの場所はありますか"
+      ],
+      "reply": "もちろんです、どのようなジャンルが好きですか？ 例えば、どの地域（例えば東京や大阪など）、歴史、文化、または現代的な祭りなどからお好みがあればお知らせください。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    },
+    {
+      "id": "ctx_3",
+      "category": "2ターン目",
+      "turns": [
+        "プログラミングを勉強しています",
+        "何から始めればいいですか"
+      ],
+      "reply": "私はAIなので、その能力はなく、「新しい」という概念はありません。それは人間がどのように機能し、どのように感じるかを分析するための提案を提供するからです。あなたが何をしているのか教えてください",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": false
+    },
+    {
+      "id": "ctx_4",
+      "category": "2ターン目",
+      "turns": [
+        "昨日映画を見ました",
+        "どう思いますか"
+      ],
+      "reply": "申し訳ありませんが、私はAIなので実際に映画やテレビ番組を見たことはありません。しかし、これはあなたがどのような好みを持つのでしょうか？例えば、音楽のジャンルや作品についての情報など、より詳しい情報を基にした情報を提供しようとします。",
+      "repetition": false,
+      "broken": false,
+      "keyword_hit": true
+    }
+  ]
+}

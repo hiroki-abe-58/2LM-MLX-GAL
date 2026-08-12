@@ -35,7 +35,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.generate import build_chat_prompt, generate_stream, load_bundle  # noqa: E402
-from src.tokenizer import CharTokenizer  # noqa: E402
+from src.tokenizer import Tokenizer  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 HERE = Path(__file__).resolve().parent
@@ -82,7 +82,7 @@ def make_holdout(corpus: Path, min_chars: int) -> None:
 # --- 指標 -------------------------------------------------------------------
 
 
-def bits_per_char(model, tokenizer: CharTokenizer, text: str, batch_size: int = 16) -> float:
+def bits_per_char(model, tokenizer: Tokenizer, text: str, batch_size: int = 16) -> float:
     """検証テキストの交差エントロピーを1文字あたりのビット数に直す.
 
     分母をトークン数ではなく **文字数** にするのがポイント。

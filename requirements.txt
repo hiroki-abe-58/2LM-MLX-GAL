@@ -4,3 +4,4 @@ fastapi>=0.115
 uvicorn[standard]>=0.30
 datasets>=3.0
 huggingface_hub>=0.26
+sentencepiece>=0.2    # サブワード化 (--vocab-size)。文字レベルだけなら不要

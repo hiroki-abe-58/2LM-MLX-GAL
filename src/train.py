@@ -33,47 +33,58 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.generate import chat_stream  # noqa: E402
 from src.model import GPTConfig, MiniGPT  # noqa: E402
-from src.tokenizer import CharTokenizer  # noqa: E402
+from src.tokenizer import CharTokenizer, SubwordTokenizer, Tokenizer, load_tokenizer  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_PROMPTS = ("こんにちは", "おすすめの本を教えてください")
 
 
-def build_dataset(corpus: Path, cache_dir: Path, min_char_freq: int) -> tuple[np.ndarray, CharTokenizer]:
+def build_dataset(
+    corpus: Path, cache_dir: Path, min_char_freq: int, vocab_size: int
+) -> tuple[np.ndarray, Tokenizer]:
     """コーパスをトークンID列 (uint16) に変換してキャッシュする.
 
-    語彙が65536未満なら uint16 で足りる。4.4M文字なら約9MBで、
+    語彙が65536未満なら uint16 で足りる。1,100万文字なら約22MBで、
     毎回エンコードし直すより速いしメモリにも丸ごと載る。
+
+    vocab_size が 0 なら文字レベル、正の値なら SentencePiece を学習する。
     """
     cache_dir.mkdir(parents=True, exist_ok=True)
     tokens_path = cache_dir / "tokens.npy"
-    tokenizer_path = cache_dir / "tokenizer.json"
     stamp_path = cache_dir / "stamp.json"
-    stamp = {"corpus": str(corpus), "mtime": corpus.stat().st_mtime, "min_char_freq": min_char_freq}
+    stamp = {
+        "corpus": str(corpus),
+        "mtime": corpus.stat().st_mtime,
+        "min_char_freq": min_char_freq,
+        "vocab_size": vocab_size,
+    }
 
     cached = tokens_path.exists() and stamp_path.exists()
     if cached and json.loads(stamp_path.read_text()) == stamp:
-        return np.load(tokens_path), CharTokenizer.load(tokenizer_path)
+        return np.load(tokens_path), load_tokenizer(cache_dir)
 
     text = corpus.read_text(encoding="utf-8")
-    tokenizer = CharTokenizer.train(text, min_freq=min_char_freq)
+    if vocab_size:
+        tokenizer = SubwordTokenizer.train(text, vocab_size=vocab_size, model_dir=cache_dir)
+    else:
+        tokenizer = CharTokenizer.train(text, min_freq=min_char_freq)
     if tokenizer.vocab_size >= 2**16:
-        raise SystemExit("語彙が65536を超えました。--min-char-freq を上げてください。")
+        raise SystemExit("語彙が65536を超えました。--vocab-size を下げてください。")
     tokens = np.array(tokenizer.encode(text), dtype=np.uint16)
     np.save(tokens_path, tokens)
-    tokenizer.save(tokenizer_path)
+    tokenizer.save(cache_dir)
     stamp_path.write_text(json.dumps(stamp))
     return tokens, tokenizer
 
 
-def save_checkpoint(path: Path, model: MiniGPT, tokenizer: CharTokenizer) -> None:
+def save_checkpoint(path: Path, model: MiniGPT, tokenizer: Tokenizer) -> None:
     tmp = path.with_name(path.name + ".tmp")
     if tmp.exists():
         shutil.rmtree(tmp)
     tmp.mkdir(parents=True)
     model.save_weights(str(tmp / "model.safetensors"))
     model.cfg.save(tmp / "config.json")
-    tokenizer.save(tmp / "tokenizer.json")
+    tokenizer.save(tmp)
     if path.exists():
         shutil.rmtree(path)
     tmp.rename(path)
@@ -103,6 +114,12 @@ def main() -> None:
     ap.add_argument("--eval-batches", type=int, default=20)
     ap.add_argument("--log-interval", type=int, default=50)
     ap.add_argument("--min-char-freq", type=int, default=1)
+    ap.add_argument(
+        "--vocab-size",
+        type=int,
+        default=0,
+        help="SentencePiece の語彙数。0 なら文字レベル (既定)",
+    )
     ap.add_argument("--seed", type=int, default=1234)
     ap.add_argument("--no-compile", action="store_true")
     args = ap.parse_args()
@@ -111,7 +128,7 @@ def main() -> None:
     rng = np.random.default_rng(args.seed)
 
     tokens, tokenizer = build_dataset(
-        Path(args.corpus), ROOT / "data" / "cache", args.min_char_freq
+        Path(args.corpus), ROOT / "data" / "cache", args.min_char_freq, args.vocab_size
     )
     n_val = min(len(tokens) // 100, 200_000)
     train_data, val_data = tokens[:-n_val], tokens[-n_val:]

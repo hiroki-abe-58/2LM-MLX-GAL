@@ -18,7 +18,7 @@ import mlx.core as mx
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.model import GPTConfig, MiniGPT  # noqa: E402
-from src.tokenizer import ASSISTANT, END, USER, CharTokenizer  # noqa: E402
+from src.tokenizer import ASSISTANT, END, USER, Tokenizer, load_tokenizer  # noqa: E402
 
 DEFAULTS = {
     "temperature": 0.8,
@@ -28,9 +28,9 @@ DEFAULTS = {
 }
 
 
-def load_bundle(ckpt_dir: str | Path) -> tuple[MiniGPT, CharTokenizer]:
+def load_bundle(ckpt_dir: str | Path) -> tuple[MiniGPT, Tokenizer]:
     ckpt = Path(ckpt_dir)
-    tokenizer = CharTokenizer.load(ckpt / "tokenizer.json")
+    tokenizer = load_tokenizer(ckpt)
     cfg = GPTConfig.load(ckpt / "config.json")
     model = MiniGPT(cfg)
     model.load_weights(str(ckpt / "model.safetensors"))
@@ -87,7 +87,7 @@ def generate_stream(
 
 
 def build_chat_prompt(
-    tokenizer: CharTokenizer,
+    tokenizer: Tokenizer,
     history: list[tuple[str, str]],
     user_text: str,
     block_size: int,
@@ -105,17 +105,40 @@ def build_chat_prompt(
     return ids[-block_size:]
 
 
+def decode_incrementally(tokenizer: Tokenizer, token_ids: Iterator[int]) -> Iterator[str]:
+    """トークン列を、表示できるようになった端から文字列として流す.
+
+    1トークンずつ独立に復号してはいけない。サブワードは byte_fallback で
+    語彙にない文字を1バイトずつのトークンに分解するので、
+    「🐱」は4トークンになる。1つずつ復号すると各バイトが不正な UTF-8 として
+    扱われ、`����` と化ける。
+
+    そこで累積したトークン列を毎回まとめて復号し、前回からの差分だけを出す。
+    末尾が U+FFFD (置換文字) のときは、まだ途中のバイト列なので次を待つ。
+    """
+    buffer: list[int] = []
+    shown = ""
+    for token_id in token_ids:
+        buffer.append(token_id)
+        text = tokenizer.decode(buffer)
+        if text.endswith("\ufffd"):
+            continue
+        if len(text) > len(shown):
+            yield text[len(shown) :]
+            shown = text
+
+
 def chat_stream(
     model: MiniGPT,
-    tokenizer: CharTokenizer,
+    tokenizer: Tokenizer,
     history: list[tuple[str, str]],
     user_text: str,
     **kwargs,
 ) -> Iterator[str]:
     prompt = build_chat_prompt(tokenizer, history, user_text, model.cfg.block_size)
     stop_ids = (tokenizer.end_id, tokenizer.user_id)
-    for token_id in generate_stream(model, prompt, stop_ids=stop_ids, **kwargs):
-        yield tokenizer.decode([token_id])
+    token_ids = generate_stream(model, prompt, stop_ids=stop_ids, **kwargs)
+    yield from decode_incrementally(tokenizer, token_ids)
 
 
 def main() -> None:
