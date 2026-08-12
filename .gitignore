@@ -10,14 +10,17 @@ data/cache*/
 data/exp/
 data/raw/*
 !data/raw/.gitkeep
+# 検査を通したギャルコーパスは成果物なので配布する（約400KB）
+!data/raw/gal_line.jsonl
 
-# ギャルコーパスはローカルLLMの出力。スクリプトだけ追跡する
+# 検査前の生成物は追跡しない。generate.py で作り直せる
 data/gal/raw.jsonl
 data/gal/topics.txt
 
-# 学習済みモデルは配布したいので final だけ追跡する（約44MB）
+# 学習済みモデルは配布したいので final と gal だけ追跡する（各約53MB）
 checkpoints/*
 !checkpoints/final
+!checkpoints/gal
 
 # 学習ログは絶対パスを含むので loss.csv と評価結果だけ残す
 runs/*
