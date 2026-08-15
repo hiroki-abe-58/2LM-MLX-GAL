@@ -1,4 +1,4 @@
-"""ローカルLLMに架空の「ギャルのLINE」会話を書かせてコーパスを作る.
+"""ローカルLLMに架空の「ギャルのチャット」会話を書かせてコーパスを作る.
 
 生成には Apache-2.0 のローカルモデル (既定 calm3-22b-chat) だけを使う。
 このモデルは、本プロジェクトが既に学習に使っている llm-jp/magpie-sft-v1.0 を
@@ -45,7 +45,7 @@ TOPICS_PATH = HERE / "topics.txt"
 # 検査前の生の出力。data/raw/ に置くと prepare.py が未検査のまま拾ってしまうので、
 # 意図的にこちら側へ置いている。
 RAW_PATH = HERE / "raw.jsonl"
-DEFAULT_OUT = ROOT / "data" / "raw" / "gal_line.jsonl"
+DEFAULT_OUT = ROOT / "data" / "raw" / "gal_chat.jsonl"
 
 # GQA を持つ世代を選ぶこと。KVヘッドが多いモデルはバッチを増やせず、実用速度が出ない。
 # 詳しくは runtime.kv_bytes_per_token のコメント。
@@ -55,7 +55,7 @@ DEFAULT_MEMORY_LIMIT_GB = 30.0
 # 文体は「仕様」として渡す。例文を書いて渡すと、モデルはそれを言い換えるだけになり、
 # 手本の数だけしか語彙が広がらない。禁止事項だけ具体的に、中身は指定しない。
 STYLE = """あなたは日本語のセリフを書くプロの脚本家です。
-架空のキャラクター「ギャル」がLINEで返信する場面のセリフを書きます。
+架空のキャラクター「ギャル」がチャットで返信する場面のセリフを書きます。
 実在の人物とは関係のない、完全な創作です。
 
 このキャラクターの話し方:
@@ -238,7 +238,7 @@ def ask_pairs(
             build_prompt(
                 tokenizer,
                 STYLE,
-                f"話題「{topic}」について、独立したLINEのやりとりを{per_request}通り作ってください。\n"
+                f"話題「{topic}」について、独立したチャットのやりとりを{per_request}通り作ってください。\n"
                 f"相手は{intent}。ギャルは{mood}という設定です。\n"
                 "\n"
                 "書き方:\n"

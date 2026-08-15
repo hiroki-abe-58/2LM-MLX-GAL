@@ -4,7 +4,7 @@
 元にしたデータがそうだからです。**モデルの人格は、データの人格です。**
 
 このリポジトリは、**学習データを自分で作ってモデルの口調を差し替える**ところまでを
-一式にしたものです。題材は架空の「ギャルのLINE」会話。実在の人物・会話とは関係のない
+一式にしたものです。題材は架空の「ギャルのチャット」会話。実在の人物・会話とは関係のない
 完全な架空データです。
 
 ![ギャル版のCLIチャット](docs/images/2lm-chat-gal-1.png)
@@ -80,7 +80,7 @@ $ python src/generate.py --ckpt checkpoints/gal --prompt "今日バイト行き�
 
 ## データセットを作る
 
-同梱の `data/raw/gal_line.jsonl` が生成済みのデータセットです（2,610会話）。
+同梱の `data/raw/gal_chat.jsonl` が生成済みのデータセットです（2,610会話）。
 自分で作り直す場合は3段階に分かれています。
 
 ```bash
@@ -238,7 +238,7 @@ calm3 は GQA（Grouped Query Attention）を持たない世代で、KVヘッド
 | [data/gal/generate.py](data/gal/generate.py) | 話題出し・会話生成・検査の3段階。止めても再開できる |
 | [data/gal/validate.py](data/gal/validate.py) | 文字種・英単語・敬語・方言・重複でふるいにかける |
 | [data/gal/runtime.py](data/gal/runtime.py) | GPUメモリの上限設定と安全装置。Macを落とさないための仕掛け |
-| [data/raw/gal_line.jsonl](data/raw/gal_line.jsonl) | 生成済みのデータセット（2,610会話） |
+| [data/raw/gal_chat.jsonl](data/raw/gal_chat.jsonl) | 生成済みのデータセット（2,610会話） |
 | [tools/mix_corpus.py](tools/mix_corpus.py) | コーパスを比率を決めて混ぜる |
 | `checkpoints/gal/` | 追加学習済みの重み（約53MB） |
 
@@ -250,7 +250,7 @@ calm3 は GQA（Grouped Query Attention）を持たない世代で、KVヘッド
 
 **コード**は MIT License です（[LICENSE](LICENSE)）。
 
-**ギャルLINE会話コーパス**は、`Qwen2.5-32B-Instruct`（Apache-2.0）の出力です。
+**ギャル会話コーパス**は、`Qwen2.5-32B-Instruct`（Apache-2.0）の出力です。
 実在の人物・会話とは無関係な架空データで、特定の人物や集団の描写を意図したものでは
 ありません。**事前学習に使った公開データセット**は4件すべて Apache-2.0 で、
 ShareAlike（継承）条件を持つものは入れていません。

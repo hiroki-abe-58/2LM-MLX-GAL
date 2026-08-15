@@ -44,7 +44,7 @@ _DIALECT_RE = re.compile(r"(ねん|やけど|あかん|ほんま|せや|へん�
 _ALLOWED_WORDS = frozenset(
     {
         "w", "ww", "www", "wwww",
-        "AI", "API", "DNA", "GPU", "CPU", "PC", "SNS", "LINE", "URL",
+        "AI", "API", "DNA", "GPU", "CPU", "PC", "SNS", "URL",
         "NISA", "ATM", "TV", "DVD", "CD", "IT", "OK", "NG",
         "Python", "ChatGPT", "GPT", "YouTube", "X",
     }

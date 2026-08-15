@@ -1,4 +1,4 @@
-# ギャルLINE会話コーパス（架空データ）
+# ギャル会話コーパス（架空データ）
 
 「自分でデータセットを作って、モデルにキャラクターを持たせる」ための教材用データセットです。
 実在の人物・会話とは一切関係のない、完全な架空データです。
@@ -140,9 +140,9 @@ calm3 は GQA（Grouped Query Attention）を持たない世代で、KVヘッド
 
 ## 使いかた
 
-検査を通したデータセットは `data/raw/gal_line.jsonl` に同梱してあります。
+検査を通したデータセットは `data/raw/gal_chat.jsonl` に同梱してあります。
 自分で作り直す場合だけ `--stage build` を走らせてください
-（`data/raw/gal_line.jsonl` を上書きします）。
+（`data/raw/gal_chat.jsonl` を上書きします）。
 
 ### 追加学習でキャラクターを付ける（推奨）
 
@@ -277,7 +277,7 @@ python src/train.py --init-from checkpoints/final --corpus data/corpus_gal.txt \
 | `runtime.py` | GPUメモリの上限設定と安全装置。Macを落とさないための仕掛け |
 | `topics.txt` | 1段目の出力。モデルが列挙した話題（追跡対象外） |
 | `raw.jsonl` | 2段目の出力。検査前の生の会話（追跡対象外） |
-| `../raw/gal_line.jsonl` | 3段目の出力。検査を通った2,610会話（**同梱**） |
+| `../raw/gal_chat.jsonl` | 3段目の出力。検査を通った2,610会話（**同梱**） |
 
 `raw.jsonl` を `data/raw/` に置いていないのは意図的です。あそこに置くと
 `data/prepare.py` が未検査のまま拾ってしまいます。

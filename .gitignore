@@ -11,7 +11,7 @@ data/exp/
 data/raw/*
 !data/raw/.gitkeep
 # 検査を通したギャルコーパスは成果物なので配布する（約400KB）
-!data/raw/gal_line.jsonl
+!data/raw/gal_chat.jsonl
 
 # 検査前の生成物は追跡しない。generate.py で作り直せる
 data/gal/raw.jsonl
